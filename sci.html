@@ -9,15 +9,6 @@ body {
     margin: 0;
     font-family: "Segoe UI", sans-serif;
     background: #020617;
-    color: #e2e8f0;
-}
-
-/* HEADER */
-header {
-    text-align: center;
-    padding: 15px;
-    border-bottom: 1px solid #1e293b;
-    letter-spacing: 2px;
 }
 
 /* GRID BACKGROUND */
@@ -48,11 +39,44 @@ header {
     to {background-position: 40px 40px;}
 }
 
+/* LOGIN */
+#login {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+#loginBox {
+    text-align: center;
+}
+
+input {
+    padding: 10px;
+    margin: 10px;
+    background: #020617;
+    border: 1px solid #38bdf8;
+    color: white;
+}
+
+/* HEADER */
+header {
+    text-align: center;
+    padding: 12px;
+    border-bottom: 1px solid #1e293b;
+    letter-spacing: 2px;
+}
+
 /* MENU */
 #menu {
     display: flex;
     justify-content: center;
     gap: 10px;
+    margin-top: 10px;
 }
 
 button {
@@ -69,19 +93,6 @@ button:hover {
     color: black;
 }
 
-/* LOG PANEL */
-#log {
-    width: 700px;
-    margin: auto;
-    background: #020617;
-    border: 1px solid #1e293b;
-    padding: 10px;
-    height: 120px;
-    overflow-y: auto;
-    font-size: 13px;
-    color: #94a3b8;
-}
-
 /* TEXT */
 #info {
     width: 700px;
@@ -89,10 +100,164 @@ button:hover {
     font-size: 14px;
     color: #cbd5f5;
 }
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background: transparent;
+    color: #e2e8f0;
+}
+
+header {
+    text-align: center;
+    padding: 10px;
+    border-bottom: 1px solid #1e293b;
+}
+
+#menu {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+#display {
+    width: 700px;
+    height: 300px;
+    margin: 20px auto;
+    position: relative;
+    border: 1px solid #1e293b;
+}
+
+#log, #info {
+    width: 700px;
+    margin: auto;
+    margin-top: 10px;
+}
+
+#health {
+    width: 700px;
+    margin: auto;
+    margin-top: 10px;
+}
+
+/* DISPLAY */
+#display {
+    width: 700px;
+    height: 300px;
+    margin: 20px auto;
+    border: 1px solid #1e293b;
+    position: relative;
+    overflow: hidden;
+}
+
+/* INFO + LOG */
+#info, #log, #health {
+    width: 700px;
+    margin: 10px auto;
+    font-size: 14px;
+}
+
+#log {
+    height: 100px;
+    overflow-y: auto;
+    color: #94a3b8;
+}
+
+/* GRAPH */
+.bar {
+    width: 30px;
+    background: gold;
+    position: absolute;
+    bottom: 0;
+}
+
+/* BACKGROUND CONTAINER */
+.hacker-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background: black;
+}
+
+/* MATRIX CANVAS */
+#matrix {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* SCAN LINES (very subtle) */
+.hacker-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(0, 255, 0, 0.05) 0px,
+        transparent 2px,
+        transparent 4px
+    );
+    pointer-events: none;
+}
+
+/* DARK OVERLAY FOR READABILITY */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: -1;
+}
+
+/* PANELS */
+#info, #log, #health, #status {
+    width: 700px;
+    margin: 10px auto;
+}
+
+#log {
+    height: 100px;
+    overflow-y: auto;
+    color: #94a3b8;
+}
+
+#progressBar {
+    width: 700px;
+    height: 6px;
+    background: rgba(255,255,255,0.1);
+    margin: 10px auto;
+}
+
+#progress {
+    height: 100%;
+    width: 0%;
+    background: #00ffff;
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
 </style>
 </head>
 
 <body>
+
+<div class="hacker-bg">
+    <canvas id="matrix"></canvas>
+</div>
+
+
+
+<!-- LOGIN -->
+<div id="login">
+    <div id="loginBox">
+        <h2>AI SYSTEM LOGIN</h2>
+        <input id="user" placeholder="Username" autocomplete="off"><br>
+        <input id="pass" type="password" placeholder="Password" autocomplete="off"><br>
+        <button onclick="enter()">Enter System</button>
+    </div>
+</div>
 
 <header> AI INTEGRATED NANOTECH & ROBOTICS SYSTEM </header>
 
@@ -104,141 +269,402 @@ button:hover {
     <button onclick="economy()">Economy</button>
 </div>
 
-<div id="display"></div>
+<div id="status">System Status: Idle</div>
+<div id="progressBar">
+    <div id="progress"></div>
+</div>
 
+<div id="display"></div>
 <div id="info">System ready. Awaiting command...</div>
 <div id="log">> Boot sequence complete...</div>
+<div id="info">System ready...</div>
+<div id="log">> Boot complete</div>
 
 <script>
 const display = document.getElementById("display");
 const log = document.getElementById("log");
 const info = document.getElementById("info");
+const health = document.getElementById("health");
+const status = document.getElementById("status");
+const progress = document.getElementById("progress");
 
+/* AUTO FOCUS */
+window.onload = () => {
+    document.getElementById("user").focus();
+};
+
+/* LOGIN */
+function enter() {
+    document.getElementById("login").style.display = "none";
+    speak("Welcome. System activated.");
+}
+
+/* VOICE */
+function speak(text) {
+    let speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "en-US";
+    speechSynthesis.speak(speech);
+}
+
+/* LOG */
 function writeLog(text) {
     log.innerHTML += "<br>> " + text;
     log.scrollTop = log.scrollHeight;
 }
 
+/* AI THINKING */
+function thinking(callback) {
+    info.innerText = "AI is analyzing...";
+    setTimeout(callback, 1000);
+}
+
+/* CLEAR */
 function clearDisplay() {
     display.innerHTML = "";
 }
 
+function changeTheme(color) {
+    document.body.style.boxShadow = "inset 0 0 100px " + color;
+}
+
+function setStatus(text) {
+    document.getElementById("status").innerText = "System Status: " + text;
+}
+setStatus("Scanning...");
+setStatus("Deploying nanobots...");
+setStatus("Analysis complete");
+
+function runProgress(callback) {
+    let p = 0;
+    let bar = document.getElementById("progress");
+
+    function animate() {
+        let speed = (100 - p) * 0.02; // slows down near the end
+        p += speed;
+
+        bar.style.width = p + "%";
+
+        if (p < 99.5) {
+            requestAnimationFrame(animate);
+        } else {
+            bar.style.width = "100%";
+            callback();
+        }
+    }
+
+    animate();
+}
+
+function setProgressColor(color1, color2) {
+    let bar = document.getElementById("progress");
+    bar.style.background = `linear-gradient(90deg, ${color1}, ${color2})`;
+}
+
+const responses = [
+    "Analyzing biological data...",
+    "Detecting anomalies...",
+    "Optimizing system efficiency...",
+    "Processing environmental variables..."
+];
+
+function randomResponse() {
+    return responses[Math.floor(Math.random() * responses.length)];
+}
+
+info.innerText = randomResponse();
+
+function changeTheme(color) {
+    document.body.style.boxShadow = "inset 0 0 100px " + color;
+}
+
+thinking(() => {
+    setStatus("Scanning...");
+    
+    setTimeout(() => {
+        setStatus("Processing...");
+        
+        setTimeout(() => {
+            setStatus("Completed");
+        }, 1000);
+        
+    }, 1000);
+});
+
 /* MEDICINE */
 function medicine() {
     clearDisplay();
-    writeLog("Deploying nanomedical units...");
-    info.innerText = "Nanobots autonomously detect pathogens and repair damaged cells at a microscopic level.";
+    changeTheme("cyan");
+    setProgressColor("cyan", "lime");
+    thinking(() => {
+        runProgress(() => {});
+        info.innerText = "Nanobots autonomously detect and eliminate pathogens while repairing cellular damage.";
+        writeLog("Medical system activated.");
+        speak("Medical nanobots deployed.");
+        speak("Nanobots autonomously detect and eliminate pathogens while repairing cellular damage.");
 
-    for (let i = 0; i < 3; i++) {
-        let bot = document.createElement("div");
-        bot.style.width = "8px";
-        bot.style.height = "8px";
-        bot.style.background = "cyan";
-        bot.style.position = "absolute";
-        bot.style.borderRadius = "50%";
-        bot.style.top = Math.random()*300 + "px";
-        bot.style.left = "0px";
-        bot.style.boxShadow = "0 0 8px cyan";
+        for (let i = 0; i < 10; i++) {
+            let bot = document.createElement("div");
+            bot.style.width = "8px";
+            bot.style.height = "8px";
+            bot.style.background = "cyan";
+            bot.style.position = "absolute";
+            bot.style.borderRadius = "50%";
+            bot.style.top = Math.random()*300 + "px";
+            bot.style.left = Math.random()*700 + "px";
+            bot.style.boxShadow = "0 0 8px cyan";
 
-        display.appendChild(bot);
-
-        setInterval(() => {
+            display.appendChild(bot);
+            setInterval(() => {
             bot.style.left = Math.random()*700 + "px";
             bot.style.top = Math.random()*350 + "px";
         }, 1000);
-    }
+        }
+        
+    });
 }
 
 /* COMMUNICATION */
 function communication() {
     clearDisplay();
-    writeLog("Initializing quantum data network...");
-    info.innerText = "Nanotech enables ultra-fast, near-instant communication systems across global networks.";
+    changeTheme("lime");
+    setProgressColor("lime", "white");
 
-    for (let i = 0; i < 20; i++) {
-        let dot = document.createElement("div");
-        dot.style.width = "4px";
-        dot.style.height = "4px";
-        dot.style.background = "lime";
-        dot.style.position = "absolute";
-        dot.style.top = Math.random()*350 + "px";
-        dot.style.left = Math.random()*700 + "px";
+    thinking(() => {
+        runProgress(() => {});
+        info.innerText = "Nanotechnology enables near-instant global communication through advanced data transmission.";
+        writeLog("Communication network initialized.");
+        speak("Global communication enabled.");
+        speak("Nanotechnology enables near-instant global communication through advanced data transmission.");
 
-        display.appendChild(dot);
+        for (let i = 0; i < 40; i++) {
+            let node = document.createElement("div");
+            node.style.width = "8px";
+            node.style.height = "8px";
+            node.style.background = "lime";
+            node.style.position = "absolute";
+            node.style.top = Math.random()*300+"px";
+            node.style.left = Math.random()*700+"px";
+            display.appendChild(node);
 
-        setInterval(() => {
-            dot.style.left = Math.random()*700 + "px";
-            dot.style.top = Math.random()*350 + "px";
-        }, 1500);
-    }
+            setInterval(() => {
+                node.style.opacity = Math.random();
+            }, 300);
+        }
+    });
 }
 
 /* TRANSPORT */
 function transport() {
     clearDisplay();
-    writeLog("Activating autonomous transport system...");
-    info.innerText = "Robotic systems eliminate human error, enabling safe and efficient autonomous transportation.";
+     changeTheme("white");
+     setProgressColor("white", "cyan");
+    cars = [];
 
+    thinking(() => {
+        runProgress(() => {});
+        info.innerText = "Autonomous vehicles navigating smart road systems.";
+        writeLog("Transport system active.");
+        speak("Autonomous transport activated.");
+        speak("Autonomous vehicles navigating smart road systems.");
+
+        /* 🛣️ CREATE ROADS */
+        function createRoad(x, y, width, height) {
+            let road = document.createElement("div");
+            road.style.position = "absolute";
+            road.style.left = x + "px";
+            road.style.top = y + "px";
+            road.style.width = width + "px";
+            road.style.height = height + "px";
+            road.style.background = "#1e293b";
+            display.appendChild(road);
+        }
+
+        // horizontal road
+        createRoad(0, 140, 700, 40);
+
+        // vertical road
+        createRoad(330, 0, 40, 300);
+
+        /* 🚗 CREATE CAR FUNCTION */
+        let cars = []; // GLOBAL list
+
+function createCar(startX, startY, dx, dy, color) {
     let car = document.createElement("div");
-    car.style.width = "40px";
-    car.style.height = "20px";
-    car.style.background = "white";
+    car.style.width = "30px";
+    car.style.height = "15px";
+    car.style.background = color;
     car.style.position = "absolute";
-    car.style.top = "150px";
-    car.style.left = "0px";
+    car.style.left = startX + "px";
+    car.style.top = startY + "px";
+    car.style.borderRadius = "3px";
 
     display.appendChild(car);
 
+    let obj = {
+        el: car,
+        x: startX,
+        y: startY,
+        dx: dx,
+        dy: dy,
+        speed: 1
+    };
+
+    cars.push(obj);
+
     setInterval(() => {
-        car.style.left = Math.random()*650 + "px";
-    }, 1000);
+
+        let blocked = false;
+
+        // CHECK OTHER CARS
+        cars.forEach(other => {
+            if (other === obj) return;
+
+            let distX = Math.abs(other.x - obj.x);
+            let distY = Math.abs(other.y - obj.y);
+
+            // same lane + too close
+            if (distX < 40 && distY < 20) {
+                blocked = true;
+            }
+        });
+
+        // MOVE OR STOP
+        if (!blocked) {
+            obj.x += obj.dx * obj.speed;
+            obj.y += obj.dy * obj.speed;
+        }
+
+        obj.el.style.left = obj.x + "px";
+        obj.el.style.top = obj.y + "px";
+
+        // RESET POSITION
+        if (obj.x > 700) obj.x = -40;
+        if (obj.x < -40) obj.x = 700;
+        if (obj.y > 300) obj.y = -20;
+        if (obj.y < -20) obj.y = 300;
+
+    }, 40);
+}
+
+        /* 🚗 MULTIPLE CARS */
+
+        // left → right
+        createCar(0, 150, 1, 0, "white");
+
+        // right → left
+        createCar(700, 165, -1, 0, "cyan");
+
+        // bottom → up
+        createCar(345, 300, 0, -1, "lime");
+
+        // top → down
+        createCar(360, 0, 0, 1, "yellow");
+        speak("Anomaly detected.");
+
+    });
 }
 
 /* AGRICULTURE */
 function agriculture() {
     clearDisplay();
-    writeLog("Enhancing crop systems...");
-    info.innerText = "Nanotechnology improves plant growth while robots monitor environmental conditions.";
+    changeTheme("green");
+    setProgressColor("green", "yellow");
 
-    for (let i = 0; i < 5; i++) {
-        let plant = document.createElement("div");
-        plant.style.width = "6px";
-        plant.style.height = "10px";
-        plant.style.background = "green";
-        plant.style.position = "absolute";
-        plant.style.bottom = "0px";
-        plant.style.left = i * 120 + "px";
+    thinking(() => {
+        runProgress(() => {});
+        info.innerText = "Nanotechnology enhances crop growth while robotic systems monitor environmental conditions.";
+        writeLog("Agriculture system optimized.");
+        speak("Agriculture systems enhanced.");
+        speak("Nanotechnology enhances crop growth while robotic systems monitor environmental conditions.");
 
-        display.appendChild(plant);
+        for (let i = 0; i < 5; i++) {
+            let plant = document.createElement("div");
+            plant.style.width = "6px";
+            plant.style.height = "10px";
+            plant.style.background = "green";
+            plant.style.position = "absolute";
+            plant.style.bottom = "0px";
+            plant.style.left = i * 120 + "px";
 
-        setTimeout(() => {
-            plant.style.height = "80px";
-        }, 500);
-    }
+            display.appendChild(plant);
+
+            setTimeout(() => {
+                plant.style.height = "80px";
+            }, 500);
+        }
+    });
 }
 
 /* ECONOMY */
 function economy() {
     clearDisplay();
-    writeLog("Analyzing economic impact...");
-    info.innerText = "Automation increases productivity but requires workforce adaptation to new technological demands.";
+    changeTheme("gold");
+    setProgressColor("gold", "orange");
 
-    for (let i = 0; i < 6; i++) {
-        let bar = document.createElement("div");
-        bar.style.width = "30px";
-        bar.style.height = "10px";
-        bar.style.background = "gold";
-        bar.style.position = "absolute";
-        bar.style.bottom = "0px";
-        bar.style.left = i * 60 + "px";
+    thinking(() => {
+        runProgress(() => {});
+        info.innerText = "Automation drives economic growth while requiring adaptation to new technological skills.";
+        writeLog("Economic analysis complete.");
+        speak("Economic metrics fluctuating.");
+        speak("Automation drives economic growth while requiring adaptation to new technological skills.");
 
-        display.appendChild(bar);
+        for (let i = 0; i < 15; i++) {
+            let bar = document.createElement("div");
+            bar.style.width = "30px";
+            bar.style.background = "gold";
+            bar.style.position = "absolute";
+            bar.style.bottom = "0px";
+            bar.style.left = i * 60 + "px";
 
-        setTimeout(() => {
-            bar.style.height = (Math.random()*150) + "px";
-        }, 300);
+            display.appendChild(bar);
+
+            setInterval(() => {
+                bar.style.height = Math.random()*200 + "px";
+            }, 1000);
+        }
+    });
+}
+
+</script>
+
+<script>
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const fontSize = 14;
+const columns = canvas.width / fontSize;
+
+const drops = [];
+for (let x = 0; x < columns; x++) {
+    drops[x] = 1;
+}
+
+function draw() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "#00ff99";
+    ctx.font = fontSize + "px monospace";
+
+    for (let i = 0; i < drops.length; i++) {
+        const text = letters[Math.floor(Math.random() * letters.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+        }
+
+        drops[i]++;
     }
 }
+
+
+
+setInterval(draw, 33);
 </script>
 
 </body>
