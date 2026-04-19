@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Future Systems Interface</title>
 
 <style>
@@ -116,8 +117,9 @@ header {
 
 #menu {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 #display {
@@ -238,6 +240,39 @@ button:active {
     transform: scale(0.95);
 }
 
+#display, #info, #log, #health, #status, #progressBar {
+    width: 90%;
+    max-width: 700px;
+    margin: 10px auto;
+}
+
+#display {
+    width: 90%;
+    max-width: 700px;
+    height: 50vh; /* responsive height */
+}
+
+@media (max-width: 600px) {
+
+    header {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    button {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    #display {
+        height: 40vh;
+    }
+
+    input {
+        width: 80%;
+    }
+
+}
 </style>
 </head>
 
